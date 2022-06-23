@@ -1,9 +1,12 @@
 import re
+import time
 
 from matplotlib import pyplot as plt
 from textblob import TextBlob
 from googletrans import Translator
 import pandas as pd
+
+import openai
 
 import nltk
 from nltk.tokenize import TweetTokenizer
@@ -13,6 +16,8 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn import svm
 from sklearn import metrics
 from sklearn.model_selection import cross_val_predict
+
+from tweetcon import search_tweets_in_user_timeline
 
 nltk.download('omw-1.4')
 nltk.download('punkt')
@@ -24,45 +29,22 @@ translator = Translator()
 
 
 def sentimentalAnalizerTwitters(tweets):
-    sum_sentiment = 0
-
-    positive_tweets = 0
-    negative_tweets = 0
-    neutral_tweets = 0
-
-    users_positives = []
-    users_negatives = []
-    users_neutrals = []
-
     if len(tweets) > 0:
+        i = 0
         for tweet in tweets:
-            if tweet.full_text != None:
+            if hasattr(tweet, 'full_text'):
                 tweet.text = tweet.full_text
-            # text = tratar(tweet.text)
-            text = tweet.text
+            text = Preprocessing(tweet.text)
             translated = translator.translate(text, src='pt', dest='en', group='tts')
             analysis = TextBlob(translated.text)
-            sum_sentiment += analysis.sentiment.polarity
-
             if analysis.sentiment.polarity > 0:
-                positive_tweets += 1
-                users_positives.append(tweet.user.screen_name)
+                tweets[i].sentiment = 'Positivo'
             elif analysis.sentiment.polarity < 0:
-                negative_tweets += 1
-                users_negatives.append(tweet.user.screen_name)
+                tweets[i].sentiment = 'Negativo'
             else:
-                neutral_tweets += 1
-                users_neutrals.append(tweet.user.screen_name)
-
-    if sum_sentiment != 0 and len(tweets) > 0:
-        average_sentiment = sum_sentiment / len(tweets)
-    else:
-        average_sentiment = 0
-        info = "Nenhum tweet foi analisado"
-
-    info = "A média de sentimento dos tweets é: " + str(average_sentiment) + "\n"
-
-    return info, average_sentiment, positive_tweets, negative_tweets, neutral_tweets, users_positives, users_negatives, users_neutrals
+                tweets[i].sentiment = 'Neutro'
+            i += 1
+    return tweets
 
 
 def removeStopWords(tweetText):
@@ -85,6 +67,8 @@ def Stemming(tweetText):
 def limpezaDeDados(tweetText):
     # remove links, pontos, virgulas e acentos dos tweets
     tweetText = re.sub(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', '', tweetText, flags=re.MULTILINE)
+    # remove @user
+    tweetText = re.sub(r'@\w+', '', tweetText, flags=re.MULTILINE)
     return tweetText
 
 
@@ -129,6 +113,7 @@ def Preprocessing(instancia):
     instancia = marque_negacao(instancia)
     instancia = re.sub(r"http\S+", "", instancia).lower().replace('.', '').replace(';', '').replace('-', '').replace(
         ':', '').replace(')', '')
+    # instancia = ''.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", instancia).split())
     stopwords = set(nltk.corpus.stopwords.words('portuguese'))
     palavras = [stemmer.stem(i) for i in instancia.split() if not i in stopwords]
     return (" ".join(palavras))
@@ -141,7 +126,7 @@ def tokenize(text):
 
 def vectorize_tweets(tweets):
     tweet_tokenizer = TweetTokenizer()
-    vectorizer = CountVectorizer(analyzer="word", tokenizer=tweet_tokenizer.tokenize, max_features=98)
+    vectorizer = CountVectorizer(analyzer="word", tokenizer=tweet_tokenizer.tokenize, max_features=6)
     freq_tweets = vectorizer.fit_transform(tweets)
     return freq_tweets
 
@@ -195,22 +180,99 @@ def analizar_tweets(tweets_data):
     return tweets_data
 
 
-def analizar_resultado(tweets_processed):
-    positivos = 0
-    negativos = 0
-    neutros = 0
-    for t in tweets_processed:
-        if t.sentiment == 'Positivo':
-            positivos += 1
-        elif t.sentiment == 'Negativo':
-            negativos += 1
-        else:
-            neutros += 1
+def openai_sentiment_analysis(tweets_data):
+    for t in tweets_data:
+        if t.full_text is not None:
+            t.text = t.full_text
+        t.sentiment = get_openai_sentiment(t.text)
+        print(t.sentiment + ' - ' + t.text + '\n')
 
-    labels = 'Positivos', 'Negativos', 'Neutros'
-    sizes = [positivos, negativos, neutros]
-    colors = ['gold', 'yellowgreen', 'lightcoral']
-    explode = (0.1, 0.1, 0.1)
-    plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-    plt.axis('equal')
-    plt.show()
+    return tweets_data
+
+
+def get_openai_sentiment(tweet):
+    tweet = Preprocessing(tweet)
+    openai.api_key = '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'
+    return openai.Completion.create(
+        engine="text-davinci-002",
+        prompt="Classify the sentiment in these tweets:\n\n1. " + tweet + "\n\nTweet sentiment ratings:",
+        temperature=0,
+        max_tokens=60,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=0.0
+    ).choices[0].text.replace('\n\n1. ', '').replace('Negative', 'Negativo').replace('Positive', 'Positivo').replace(
+        'Neutral', 'Neutro')
+
+
+def removeDupicatesUser(tweets_data):
+    users = []
+    tweets_processed = []
+    for t in tweets_data:
+        if t.user.screen_name not in users:
+            tweets_processed.append(t)
+        else:
+            users.append(t.user.screen_name)
+
+    return tweets_processed
+
+
+# procura relação
+def search_relation_and_run_sentiment_analysis(tweets_data=[], terms_to_relationize=[],
+                                               qtd_tweets_from_user_to_analize=5, user_open_ai=False):
+    i = 0
+    terms_result = []
+    for t in tweets_data:
+        tweets_data[i].result_analysis = []
+        for term in terms_to_relationize:
+            twts = search_tweets_in_user_timeline(t.user.screen_name, term, qtd_tweets_from_user_to_analize)
+            time.sleep(1)
+            positive = 0
+            negative = 0
+            neutral = 0
+            for twt in twts:
+                if twt.full_text is not None:
+                    twt.text = twt.full_text
+
+                if user_open_ai:
+                    sentiment = get_openai_sentiment(twt.text)
+                else:
+                    sentiment = sentimentalAnalizerTwitters([twt])[0].sentiment
+
+                if sentiment == 'Positivo':
+                    positive += 1
+                elif sentiment == 'Negativo':
+                    negative += 1
+                else:
+                    neutral += 1
+
+            if positive > negative and positive > neutral:
+                sentiment = 'Positivo'
+            elif negative > neutral and negative > positive:
+                sentiment = 'Negativo'
+            elif (neutral > positive and neutral > negative) or (positive == negative):
+                sentiment = 'Neutro'
+
+            results = {
+                'term': term,
+                'sentiment': sentiment,
+                'user': t.user.screen_name,
+                'userid': t.user.id,
+                'positive': positive,
+                'negative': negative,
+                'neutral': neutral,
+                'total': positive + negative + neutral,
+                'tweet': t.text,
+                'img': t.user.profile_image_url_https,
+                'frist_sentiment': t.sentiment,
+                'retweets': t.retweet_count,
+                'favorites': t.favorite_count,
+                'tipo': t.tipo,
+            }
+            if t.tipo == 'retweet':
+                results['retweet_from'] = t.retweet_from
+                results['retweet_from_id'] = t.retweet_from_id
+
+            terms_result.append(results)
+        i += 1
+    return terms_result

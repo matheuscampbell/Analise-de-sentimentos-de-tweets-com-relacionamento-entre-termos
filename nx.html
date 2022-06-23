@@ -1,0 +1,123 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@latest/styles/vis-network.css" type="text/css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@latest/dist/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 1000px;
+            height: 1000px;
+            background-color: #ffffff;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+
+        
+        #config {
+            float: left;
+            width: 400px;
+            height: 600px;
+        }
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+
+<div id = "config"></div>
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"group": 0, "id": 0, "label": "bolsonaro", "shape": "dot", "size": 40, "title": "bolsonaro", "x": 1500, "y": 1850}, {"color": "#ff0000", "group": 1, "id": 82271629, "image": "https://pbs.twimg.com/profile_images/1476564339301752835/qcGy8rXQ_normal.jpg", "label": 82271629, "shape": "dot", "size": 35, "title": "carlosjordy - Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita por Tabata Amaral.\n\nJuiz decreta pris\u00e3o de Milton Ribeiro.\n\nO que essas decis\u00f5es t\u00eam comum? O juiz Renato Coelho Borelli. Mas deve ser apenas coincid\u00eancia."}, {"color": "#ffff00", "group": 1, "id": 36751573, "image": "https://pbs.twimg.com/profile_images/1420783093384949767/BZ35kqF2_normal.jpg", "label": 36751573, "shape": "dot", "size": 35, "title": "sensacionalista - Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 3349970531, "image": "https://pbs.twimg.com/profile_images/1441366412061196288/zWGqyWEg_normal.jpg", "label": 3349970531, "shape": "dot", "size": 35, "title": "AndreBorges_JOR - S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria afast\u00e1-lo, mesmo ap\u00f3s tudo vir \u00e0 tona. Ribeiro foi exonerado \"a pedido\" dele pr\u00f3prio. E Bolsonaro ainda prometeu que ele retornaria ao cargo. https://t.co/TVKOnTIA2K"}, {"group": 1, "id": 1, "label": "lula", "shape": "dot", "size": 40, "title": "lula", "x": 900.0, "y": 150}, {"color": "#ff0000", "group": 1, "id": 1340162510, "image": "https://pbs.twimg.com/profile_images/1478253752461283332/BbR6855w_normal.jpg", "label": 1340162510, "shape": "dot", "size": 27, "title": "leonardobragga - RT @carlosjordy: Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita\u2026"}, {"color": "#ff0000", "group": 1, "id": 1429030410944667652, "image": "https://pbs.twimg.com/profile_images/1429030904152866817/54TfziC8_normal.jpg", "label": 1429030410944667652, "shape": "dot", "size": 27, "title": "NoelyRockenbach - RT @carlosjordy: Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita\u2026"}, {"color": "#ff0000", "group": 1, "id": 939938777514037251, "image": "https://pbs.twimg.com/profile_images/1356137337223335937/SELbBYGg_normal.jpg", "label": 939938777514037251, "shape": "dot", "size": 27, "title": "AdeilsonBritoO1 - RT @carlosjordy: Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita\u2026"}, {"color": "#ff0000", "group": 1, "id": 1855408104, "image": "https://pbs.twimg.com/profile_images/1282203972359655424/QhaHoYKP_normal.jpg", "label": 1855408104, "shape": "dot", "size": 27, "title": "dani_ssou - RT @carlosjordy: Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita\u2026"}, {"color": "#ff0000", "group": 1, "id": 1251105352239779842, "image": "https://pbs.twimg.com/profile_images/1349722160508653569/9uxxwdPG_normal.jpg", "label": 1251105352239779842, "shape": "dot", "size": 27, "title": "Patriotaraiz1 - RT @carlosjordy: Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita\u2026"}, {"color": "#ff0000", "group": 1, "id": 1020854777926881280, "image": "https://pbs.twimg.com/profile_images/1485933323277029378/Rf9OwLGa_normal.jpg", "label": 1020854777926881280, "shape": "dot", "size": 27, "title": "rafael94silva - RT @carlosjordy: Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita\u2026"}, {"color": "#ff0000", "group": 1, "id": 958142578582609922, "image": "https://pbs.twimg.com/profile_images/1093748470098391040/PsWDQUa0_normal.jpg", "label": 958142578582609922, "shape": "dot", "size": 27, "title": "tatyane_rolim - RT @carlosjordy: Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita\u2026"}, {"color": "#ff0000", "group": 1, "id": 1273450338624901122, "image": "https://pbs.twimg.com/profile_images/1510709908139823123/MV3sFCWC_normal.jpg", "label": 1273450338624901122, "shape": "dot", "size": 27, "title": "PaPoABeRToRR - RT @carlosjordy: Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita\u2026"}, {"color": "#ff0000", "group": 1, "id": 66773971, "image": "https://pbs.twimg.com/profile_images/1311731614247006208/vooN2s1C_normal.jpg", "label": 66773971, "shape": "dot", "size": 27, "title": "Salomaoliberato - RT @carlosjordy: Juiz determina o uso obrigat\u00f3rio de m\u00e1scaras e multa para Bolsonaro.\n\nJuiz torna S\u00e9rgio Camargo r\u00e9u em queixa-crime feita\u2026"}, {"color": "#ffff00", "group": 1, "id": 36214592, "image": "https://pbs.twimg.com/profile_images/1517135571226746882/n30kqp2H_normal.jpg", "label": 36214592, "shape": "dot", "size": 27, "title": "oicolibri - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 1044758060563132417, "image": "https://pbs.twimg.com/profile_images/1454905197491367937/mCyhNyOm_normal.jpg", "label": 1044758060563132417, "shape": "dot", "size": 27, "title": "lh_virgo - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 193941450, "image": "https://pbs.twimg.com/profile_images/1057875824534282240/fC0OrB6h_normal.jpg", "label": 193941450, "shape": "dot", "size": 27, "title": "lula_tani1000 - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 1332367627658944520, "image": "https://pbs.twimg.com/profile_images/1393387809881403394/AO9GwMAV_normal.jpg", "label": 1332367627658944520, "shape": "dot", "size": 27, "title": "Simone89226244 - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 266739378, "image": "https://pbs.twimg.com/profile_images/1575358138/DSC04106-3_normal.jpg", "label": 266739378, "shape": "dot", "size": 27, "title": "carmendkjlle - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 2870502065, "image": "https://pbs.twimg.com/profile_images/1428854097420107779/LFXBKHwf_normal.jpg", "label": 2870502065, "shape": "dot", "size": 27, "title": "m_soniaps - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 1245113691005227008, "image": "https://pbs.twimg.com/profile_images/1532777003614617600/f0hcGYbl_normal.jpg", "label": 1245113691005227008, "shape": "dot", "size": 27, "title": "xaviermatheus_ - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 2616044030, "image": "https://pbs.twimg.com/profile_images/463705400756285440/rFGGEW8c_normal.png", "label": 2616044030, "shape": "dot", "size": 27, "title": "goesjorge1 - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 3129020296, "image": "https://pbs.twimg.com/profile_images/727603568023379968/hg3XUBjg_normal.jpg", "label": 3129020296, "shape": "dot", "size": 27, "title": "falccheti - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 1278404123101204480, "image": "https://pbs.twimg.com/profile_images/1278407030710116353/XrPf5W7d_normal.jpg", "label": 1278404123101204480, "shape": "dot", "size": 27, "title": "baazapia - RT @sensacionalista: Bolsonaro n\u00e3o botou cara no fogo por Milton Ribeiro porque o g\u00e1s t\u00e1 muito caro https://t.co/UtG3GCMkPv"}, {"color": "#ffff00", "group": 1, "id": 3304975767, "image": "https://pbs.twimg.com/profile_images/1286301308375490560/ApkVaJg9_normal.jpg", "label": 3304975767, "shape": "dot", "size": 27, "title": "anagomyde - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}, {"color": "#ffff00", "group": 1, "id": 2236488609, "image": "https://pbs.twimg.com/profile_images/488444633731854338/w8HZy1gV_normal.jpeg", "label": 2236488609, "shape": "dot", "size": 27, "title": "GCrzu - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}, {"color": "#ffff00", "group": 1, "id": 77011911, "image": "https://pbs.twimg.com/profile_images/1292908484497899521/vDGccfRj_normal.jpg", "label": 77011911, "shape": "dot", "size": 27, "title": "prteruel - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}, {"color": "#ffff00", "group": 1, "id": 38077503, "image": "https://pbs.twimg.com/profile_images/1408029571841236992/WhJyE5Tt_normal.jpg", "label": 38077503, "shape": "dot", "size": 27, "title": "marnencarvalho - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}, {"color": "#ffff00", "group": 1, "id": 213631976, "image": "https://pbs.twimg.com/profile_images/1215162809/image_normal.jpg", "label": 213631976, "shape": "dot", "size": 27, "title": "mauvelasco - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}, {"color": "#ffff00", "group": 1, "id": 48992982, "image": "https://pbs.twimg.com/profile_images/579607866191011840/HuIy2zpk_normal.jpg", "label": 48992982, "shape": "dot", "size": 27, "title": "marcosportela - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}, {"color": "#ffff00", "group": 1, "id": 2576356676, "image": "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png", "label": 2576356676, "shape": "dot", "size": 27, "title": "me_mardi - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}, {"color": "#ffff00", "group": 1, "id": 1047761140984340480, "image": "https://pbs.twimg.com/profile_images/1050496633765429248/wVZFMxxt_normal.jpg", "label": 1047761140984340480, "shape": "dot", "size": 27, "title": "kmemoria1 - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}, {"color": "#ffff00", "group": 1, "id": 187770549, "image": "https://pbs.twimg.com/profile_images/1267620879455989760/nCOB8anW_normal.jpg", "label": 187770549, "shape": "dot", "size": 27, "title": "everaldoleite22 - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}, {"color": "#ffff00", "group": 1, "id": 844881736827834369, "image": "https://pbs.twimg.com/profile_images/878780552123486208/7BIuideV_normal.jpg", "label": 844881736827834369, "shape": "dot", "size": 27, "title": "PatyFFischer - RT @AndreBorges_JOR: S\u00f3 pra esclarecer. N\u00e3o \u00e9 verdade que Bolsonaro \"afastou\" Milton Ribeiro, por causa das den\u00fancias. O governo n\u00e3o queria\u2026"}]);
+        edges = new vis.DataSet([{"color": "#ff0000", "from": 0, "label": 3678, "title": "Negativo - lula", "to": 82271629, "weight": 3678}, {"color": "#ffff00", "from": 0, "label": 2183, "title": "Neutro - lula", "to": 36751573, "weight": 2183}, {"color": "#ffff00", "from": 0, "label": 1150, "title": "Neutro - lula", "to": 3349970531, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 82271629, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 36751573, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 3349970531, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 1340162510, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 1429030410944667652, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 939938777514037251, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 1855408104, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 1251105352239779842, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 1020854777926881280, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 958142578582609922, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 1273450338624901122, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 3678, "title": "Negativo - lula", "to": 66773971, "weight": 3678}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 36214592, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 1044758060563132417, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 193941450, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 1332367627658944520, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 266739378, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 2870502065, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 1245113691005227008, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 2616044030, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 3129020296, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 2183, "title": "Neutro - lula", "to": 1278404123101204480, "weight": 2183}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 3304975767, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 2236488609, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 77011911, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 38077503, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 213631976, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 48992982, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 2576356676, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 1047761140984340480, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 187770549, "weight": 1150}, {"color": "#ffff00", "from": 1, "label": 1150, "title": "Neutro - lula", "to": 844881736827834369, "weight": 1150}, {"color": "#ff0000", "from": 82271629, "label": 3678, "title": "Negativo - lula", "to": 1340162510, "weight": 3678}, {"color": "#ff0000", "from": 82271629, "label": 3678, "title": "Negativo - lula", "to": 1429030410944667652, "weight": 3678}, {"color": "#ff0000", "from": 82271629, "label": 3678, "title": "Negativo - lula", "to": 939938777514037251, "weight": 3678}, {"color": "#ff0000", "from": 82271629, "label": 3678, "title": "Negativo - lula", "to": 1855408104, "weight": 3678}, {"color": "#ff0000", "from": 82271629, "label": 3678, "title": "Negativo - lula", "to": 1251105352239779842, "weight": 3678}, {"color": "#ff0000", "from": 82271629, "label": 3678, "title": "Negativo - lula", "to": 1020854777926881280, "weight": 3678}, {"color": "#ff0000", "from": 82271629, "label": 3678, "title": "Negativo - lula", "to": 958142578582609922, "weight": 3678}, {"color": "#ff0000", "from": 82271629, "label": 3678, "title": "Negativo - lula", "to": 1273450338624901122, "weight": 3678}, {"color": "#ff0000", "from": 82271629, "label": 3678, "title": "Negativo - lula", "to": 66773971, "weight": 3678}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 36214592, "weight": 2183}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 1044758060563132417, "weight": 2183}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 193941450, "weight": 2183}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 1332367627658944520, "weight": 2183}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 266739378, "weight": 2183}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 2870502065, "weight": 2183}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 1245113691005227008, "weight": 2183}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 2616044030, "weight": 2183}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 3129020296, "weight": 2183}, {"color": "#ffff00", "from": 36751573, "label": 2183, "title": "Neutro - lula", "to": 1278404123101204480, "weight": 2183}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 3304975767, "weight": 1150}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 2236488609, "weight": 1150}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 77011911, "weight": 1150}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 38077503, "weight": 1150}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 213631976, "weight": 1150}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 48992982, "weight": 1150}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 2576356676, "weight": 1150}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 1047761140984340480, "weight": 1150}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 187770549, "weight": 1150}, {"color": "#ffff00", "from": 3349970531, "label": 1150, "title": "Neutro - lula", "to": 844881736827834369, "weight": 1150}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": true,
+        "filter": [
+            "physics"
+        ]
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+        // if this network requires displaying the configure window,
+        // put it in its div
+        options.configure["container"] = document.getElementById("config");
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+
+
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>

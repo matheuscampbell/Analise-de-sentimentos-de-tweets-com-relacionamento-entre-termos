@@ -17,9 +17,14 @@ def auth():
     return tweepy.API(auth)
 
 
-def get_tweets(query, qtd_tweets=1000):
+def get_tweets(query, qtd_tweets=100):
     api = auth()
-    return api.search_tweets(q=query, count=qtd_tweets, lang='pt', result_type='mixed', tweet_mode='extended')
+    r = api.search_tweets(q=query, count=qtd_tweets, lang='pt', result_type='popular', tweet_mode='extended',
+                             include_rts=False)
+    for t in r:
+        t.tipo = 'tweet'
+
+    return r
 
 
 def get_tweets_by_user(user, qtd_tweets=100):
@@ -42,7 +47,18 @@ def search_Term(term, tweets):
 
     return founds
 
+
 def search_tweets_in_user_timeline(user, term, qtd_tweets=100):
     tweets = get_tweets_by_user(user, qtd_tweets)
     founds = search_Term(term, tweets)
     return founds
+
+
+def get_retweets_by_tweet(id, max=10):
+    api = auth()
+    return api.get_retweets(id, count=max)
+
+
+def get_trends():
+    api = auth()
+    return api.get_place_trends(id=23424768)
